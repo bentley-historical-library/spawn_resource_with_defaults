@@ -117,10 +117,9 @@ Rails.application.config.after_initialize do
               default_values = defaults.values
               note_types = notes.map {|note| note[:type]}
               default_notes = default_values["notes"]
-
               notes.concat(default_notes.reject {|note| note_types.include?(note["type"])})
               default_values.delete("notes")
-              # Don't overwrrite the existing extents if they exist
+              # Don't overwrrite the existing extents
               if self.extents && !self.extents.empty?
                   default_values.delete("extents")
               end
