@@ -106,7 +106,7 @@ Rails.application.config.after_initialize do
       end
 
       # For some reason, extents were either not getting added or were being overwritten later on
-      if accession.extents and !self.extents
+      if accession.extents && !accession.extents.empty? && !self.extents && !self.extents.empty?
           self.extents = accession.extents
       end
 
@@ -120,8 +120,8 @@ Rails.application.config.after_initialize do
 
               notes.concat(default_notes.reject {|note| note_types.include?(note["type"])})
               default_values.delete("notes")
-              # Don't overwrrite the existing extents, if they exist
-              if self.extents
+              # Don't overwrrite the existing extents if they exist
+              if self.extents && !self.extents.empty?
                   default_values.delete("extents")
               end
               self.update(default_values)
