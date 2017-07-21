@@ -9,6 +9,7 @@ Rails.application.config.after_initialize do
         acc = Accession.find(params[:accession_id], find_opts)
 
         if acc
+          # Modify this to send along the user_prefs['default_values'] to the modified populate_from_accession
           @resource.populate_from_accession(acc, user_prefs['default_values'])
           flash.now[:info] = I18n.t("resource._frontend.messages.spawned", JSONModelI18nWrapper.new(:accession => acc))
           flash[:spawned_from_accession] = acc.id
@@ -29,7 +30,7 @@ Rails.application.config.after_initialize do
   end
 
   Resource.class_eval do
-
+    # Modify this function definition to add a user_prefs_default_values parameter
     def populate_from_accession(accession, user_prefs_default_values=False)
       values = accession.to_hash(:raw)
 
@@ -57,14 +58,16 @@ Rails.application.config.after_initialize do
                                                                     }])
       end
 
-      if accession.condition_description
-        notes << JSONModel(:note_singlepart).from_hash(:type => "physdesc",
-                                                       :label => I18n.t('accession.condition_description'),
-                                                       :content => [accession.condition_description])
-      end
+      # Don't make a physdesc not from this
+      #if accession.condition_description
+        #notes << JSONModel(:note_singlepart).from_hash(:type => "physdesc",
+        #                                               :label => I18n.t('accession.condition_description'),
+        #                                               :content => [accession.condition_description])
+      #end
 
       self.related_accessions = [{'ref' => accession.uri, '_resolved' => accession}]
 
+      # Comment this out, we'll be adding notes a little later
       #self.notes = notes
 
       self.update(values)
@@ -73,6 +76,7 @@ Rails.application.config.after_initialize do
         rights_statement.clone.tap {|r| r.delete('identifier')}
       }
 
+      # Comment these out and run this check at the very end
       #if !self.extents || self.extents.empty?
         #self.extents = [JSONModel(:extent).new._always_valid!]
       #end
@@ -101,8 +105,7 @@ Rails.application.config.after_initialize do
                                                                       }])
       end
 
-      extents ||= []
-
+      # For some reason, extents were either not getting added or were being overwritten later on
       if accession.extents and !self.extents
           self.extents = accession.extents
       end
@@ -117,10 +120,11 @@ Rails.application.config.after_initialize do
 
               notes.concat(default_notes.reject {|note| note_types.include?(note["type"])})
               default_values.delete("notes")
+              # Don't overwrrite the existing extents, if they exist
               if self.extents
                   default_values.delete("extents")
               end
-              self.update(default_values) {|key, v1, v2| v1}
+              self.update(default_values)
           end
       end
 
