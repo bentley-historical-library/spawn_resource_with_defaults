@@ -51,14 +51,14 @@ Rails.application.config.after_initialize do
 
       if accession.content_description
         notes << JSONModel(:note_multipart).from_hash(:type => "scopecontent",
-                                                      :label => I18n.t('accession.content_description'),
+                                                      :label => "",
                                                       :subnotes => [{
                                                                       'content' => accession.content_description,
                                                                       'jsonmodel_type' => 'note_text'
                                                                     }])
       end
 
-      # Don't make a physdesc not from this
+      # Don't make a physdesc note from this
       #if accession.condition_description
         #notes << JSONModel(:note_singlepart).from_hash(:type => "physdesc",
         #                                               :label => I18n.t('accession.condition_description'),
